@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: x-ray-sample-middle-k8s
+spec:
+  ports:
+    - port: 80
+      targetPort: 8080
+  selector:
+    app: x-ray-sample-middle-k8s
+    tier: middle
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: x-ray-sample-middle-k8s
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 2
+      maxSurge: 2
+  selector:
+    matchLabels:
+      app: x-ray-sample-middle-k8s
+      tier: middle
+  template:
+    metadata:
+      labels:
+        app: x-ray-sample-middle-k8s
+        tier: middle
+    spec:
+      containers:
+        - name: x-ray-sample-middle-k8s
+          image: jinglinhu/eks-workshop-x-ray-sample-middle:1.0.1
+          securityContext:
+            privileged: false
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+          ports:
+            - containerPort: 8080
